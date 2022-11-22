@@ -150,8 +150,13 @@ def average_crossing(population: np.ndarray, probability: float) -> None:
     :param population: specimens to cross
     :param probability: probability of crossing
     """
-    # TODO
-    pass
+    do_cross = np.random.uniform(size=len(population)//2)
+    for i in range(0, len(population), 2):
+        if do_cross[i//2] < probability:
+            population[i] += population[i+1]
+            population[i+1] += population[i]
+            population[i] /= 2
+            population[i+1] /= 2
 
 
 def uniform_crossing(population: np.ndarray, probability: float) -> None:
