@@ -161,5 +161,12 @@ def uniform_crossing(population: np.ndarray, probability: float) -> None:
 
     :param population: specimens to cross
     """
-    # TODO
-    pass
+    do_cross = np.random.uniform(size=len(population)//2)
+    num_of_feat = population.shape[1]
+    for i in range(0, len(population), 2):
+        if do_cross[i//2] < probability:
+            for f in range(num_of_feat):
+                if np.random.random() < 0.5:
+                    population[i][f], population[i+1][f] = (
+                        population[i+1][f], population[i][f]
+                    )
