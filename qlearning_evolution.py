@@ -58,3 +58,9 @@ class QLearningEvolution:
         else:
             # choose action with the highest q_table value
             return np.argmax(self.q_table[dist_bin, success_bin, :, :])
+    
+    def reset_qtable(self):
+        '''
+        Sets Qtable to all zeros
+        '''
+        self.q_table = np.zeros([*self.state_shape, *self.action_shape])
