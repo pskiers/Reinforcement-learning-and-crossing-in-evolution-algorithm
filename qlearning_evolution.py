@@ -15,8 +15,22 @@ success_bins = [(x*10 + 5)/100 for x in range(10)]
 
 
 class QLearningEvolution:
-    def __init__(self):
-        pass
+    def __init__(self, mean_distance_bins: list, success_rate_bins: list, crossing_functions: list, crossing_probabilities: list, epsilon: float):
+        # bins for state discretization
+        self.mean_distance_bins = mean_distance_bins
+        self.success_rate_bins = success_rate_bins
+
+        # actions lists
+        self.crossing_functions = crossing_functions
+        self.crossing_probabilities = crossing_probabilities
+
+        # state and actions shapes
+        self.state_shape = [len(self.mean_distance_bins) + 1, len(self.success_rate_bins) + 1]
+        self.action_shape = [len(crossing_functions), len(crossing_probabilities)]
+
+        # q-learning parameters and qtable
+        self.q_table = np.zeros([*self.state_shape, *self.action_shape])
+        self.epsilon = epsilon
 
 
 def QLearningEvolution(evolution_algorithm, learning_rate, discount, epsilon, max_iter, success_rate):
