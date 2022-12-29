@@ -9,7 +9,7 @@ from evolution_algorithm import EvolutionAlgorithm
 
 
 class QLearningEvolution:
-    def __init__(self, evolution_algorithm: EvolutionAlgorithm, mean_distance_bins: list, success_rate_bins: list, crossing_functions: list, crossing_probabilities: list, epsilon: float):
+    def __init__(self, evolution_algorithm: EvolutionAlgorithm, mean_distance_bins: list, success_rate_bins: list, crossing_functions: list, crossing_probabilities: list, epsilon: float, learning_rate: float):
         # evolution algorithm to optimize
         # will be deepcopied before every run
         self.evolution_algorithm = evolution_algorithm
@@ -29,6 +29,7 @@ class QLearningEvolution:
         # q-learning parameters and qtable
         self.q_table = np.zeros([*self.state_shape, *self.action_shape])
         self.epsilon = epsilon
+        self.learning_rate = learning_rate
 
     def discretize_state(self, mean_distance: float, success_rate: float) -> tuple:
         '''
