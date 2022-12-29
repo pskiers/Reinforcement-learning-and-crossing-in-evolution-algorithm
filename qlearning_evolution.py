@@ -66,3 +66,40 @@ class QLearningEvolution:
         Sets Qtable to all zeros
         '''
         self.q_table = np.zeros([*self.state_shape, *self.action_shape])
+
+    def update_qtable(self, state: tuple, action: tuple, next_state: tuple, reward: float):
+        # TODO
+        self.q_table[*state, *action] = (1 - self.learning_rate) * self.q_table[*state, *action] + self.learning_rate * (reward + self.discount_factor * np.max(self.q_table[next_state, :]))
+
+    def run(self, iterations: int):
+        self.reset_qtable()
+        evolution = copy.deepcopy(self.evolution_algorithm)
+        
+        # get starting state
+        state = (evolution._calculate_mean_distance, evolution._calculate_success_rate)
+        
+        # xbest, obest ← znajdź najlepszego( P0, o )
+
+        for _ in range(iterations)
+            # choose action
+            action = self.choose_action(*state)
+            cross_func = self.crossing_functions(action[0])
+            cross_prob = self.crossing_probabilities(action[1])
+
+            # perform genetic operations
+            evolution.next_generation(cross_func, cross_prob)
+
+            # xbest , obest ← znajdź najlepszego( M, om,  xbest, obest )
+
+
+            # get new state
+            state_next = (evolution._calculate_mean_distance, evolution._calculate_success_rate)
+
+            # get reward
+            reward = evolution.value_function(evolution.best)
+
+            # update qtable
+            self.update_qtable(state, action, state_next, reward)
+
+            # next iteration
+            state = state_next
