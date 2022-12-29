@@ -1,11 +1,22 @@
 """
 Module containing implementation of qlearning algorithm
 """
+import numpy as np
+
 from evolution_algorithm import EvolutionAlgorithm, one_point_crossing, average_crossing, uniform_crossing
 
 
 crossing_functions = [one_point_crossing, average_crossing, uniform_crossing]
-crossing_probabilities = [(x/10)+0.05 for x in range(10)]
+crossing_probabilities = [(x*10 + 5)/100 for x in range(10)]
+
+# mean distance and success rate will be discreticised using np.digitize
+distance_bins = [10**x for x in range(6)]
+success_bins = [(x*10 + 5)/100 for x in range(10)]
+
+
+class QLearningEvolution:
+    def __init__(self):
+        pass
 
 
 def QLearningEvolution(evolution_algorithm, learning_rate, discount, epsilon, max_iter, success_rate):
