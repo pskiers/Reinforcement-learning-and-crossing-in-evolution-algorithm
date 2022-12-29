@@ -32,6 +32,35 @@ class QLearningEvolution:
         self.q_table = np.zeros([*self.state_shape, *self.action_shape])
         self.epsilon = epsilon
 
+    def discretize_state(self, mean_distance: float, success_rate: float) -> tuple:
+        '''
+        Discreticizes given state (mean_distance and success rate of evolution algorithm) using np.digitize and bins declared in init.
+
+        :param mean_distance: mean euclidean distance between specimens of current population
+        :param success_rate: mean percent of specimens from previous population worse than specimen from current population
+
+        :return: bin indexes for both values respectively, expressed as a tuple of two integers
+        '''
+        return np.digitize(mean_distance, self.mean_distance_bins), np.digitize(success_rate, self.success_rate_bins)
+
+    def choose_action(self, mean_distance: float, success_rate: float) -> tuple:
+        '''
+        Choose next action based on qtable and current mean distance and success rate using epsilon-greedy policy
+
+        :param mean_distance: mean euclidean distance between specimens of current population
+        :param success_rate: mean percent of specimens from previous population worse than specimen from current population
+
+        :return: next action
+        '''
+        dist_bin, success_bin = self.discretize_state(mean_distance, success_rate)
+
+        if np.random.rand() < self.epsilon:
+            # choose random action
+            return tuple([np.random.randint(0, max_val) for max_val in self.action_shape])
+        else:
+            # choose action with the highest q_table value
+            return np.argmax(self.q_table[dist_bin, success_bin, :, :])
+
 
 def QLearningEvolution(evolution_algorithm, learning_rate, discount, epsilon, max_iter, success_rate):
     # Q ← zainicjalizuj
