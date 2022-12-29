@@ -1,11 +1,19 @@
 """
 Module containing implementation of qlearning algorithm
 """
+import copy
+
 import numpy as np
+
+from evolution_algorithm import EvolutionAlgorithm
 
 
 class QLearningEvolution:
-    def __init__(self, mean_distance_bins: list, success_rate_bins: list, crossing_functions: list, crossing_probabilities: list, epsilon: float):
+    def __init__(self, evolution_algorithm: EvolutionAlgorithm, mean_distance_bins: list, success_rate_bins: list, crossing_functions: list, crossing_probabilities: list, epsilon: float):
+        # evolution algorithm to optimize
+        # will be deepcopied before every run
+        self.evolution_algorithm = evolution_algorithm
+        
         # bins for state discretization
         self.mean_distance_bins = mean_distance_bins
         self.success_rate_bins = success_rate_bins
