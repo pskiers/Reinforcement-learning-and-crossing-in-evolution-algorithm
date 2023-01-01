@@ -48,7 +48,7 @@ class EvolutionAlgorithm:
         self._find_best()
         self._succession()
         self.epoch += 1
-        return self._calculate_success_rate(), self._calculate_mean_distance()
+        return self.calculate_mean_distance(), self._calculate_success_rate()
 
     def _find_best(self) -> None:
         """
@@ -108,10 +108,10 @@ class EvolutionAlgorithm:
         """
         successes = 0
         for evaluation in self.evaluations:
-            successes += len(self.previous_evaluations < evaluation)
+            successes += (self.previous_evaluations < evaluation).sum()
         return successes / (self.population_size * self.population_size)
 
-    def _calculate_mean_distance(self) -> float:
+    def calculate_mean_distance(self) -> float:
         """
         Calculates mean euclidean distance between specimens of current population
 
@@ -121,7 +121,6 @@ class EvolutionAlgorithm:
         for i in range(self.population_size):
             distance_sum += np.sum(np.linalg.norm(self.population[i:] - self.population[i]))
         return distance_sum / self.population_size
-
 
 
 def one_point_crossing(population: np.ndarray, probability: float) -> None:
