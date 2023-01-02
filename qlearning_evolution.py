@@ -3,10 +3,25 @@ Module containing implementation of qlearning algorithm
 """
 import copy
 from typing import Callable
-
+from dataclasses import dataclass
 import numpy as np
-
 from evolution_algorithm import EvolutionAlgorithm
+
+@dataclass
+class Record:
+    """
+    Class represents single history record
+    """
+    best_point: np.ndarray
+    best_evaluation: float
+    avg_distance: float
+    distance_bin: int
+    success_rate: float
+    success_bin: int
+    crossing_func: str
+    crossing_probability: float
+    reward: float
+
 
 
 class QLearningEvolution:
@@ -70,12 +85,14 @@ class QLearningEvolution:
         epsilon-greedy policy
 
         :param mean_distance: mean euclidean distance between specimens of current population
-        :param success_rate: mean percent of specimens from previous population worse than specimen from
-        current population
+        :param success_rate: mean percent of specimens from previous population worse than specimen
+            from current population
 
         :return: next action
         """
-        dist_bin, success_bin = self.discretize_state(mean_distance, success_rate)
+        dist_bin, success_bin = self.discretize_state(
+            mean_distance, success_rate
+        )
 
         if np.random.rand() < self.epsilon:
             # choose random action
@@ -106,10 +123,19 @@ class QLearningEvolution:
             self.q_table[state[0], state[1], action[0], action[1]] + self.learning_rate * \
             (reward + self.discount_factor * np.max(self.q_table[next_state, :]))
 
-    def run(self, iterations: int):
+    def run(self, iterations: int, verbose: bool = True) -> list[Record]:
+        """
+        Runs the algorithm
+
+        :param iterations: number of iterations to run
+        :param verbose: if set to false the method runs silently
+
+        :return: history of the run
+        """
         self.reset_qtable()
         evolution = copy.deepcopy(self.evolution_algorithm)
 
+        history = []
         # get starting state
         state = self.discretize_state(self.evolution_algorithm.calculate_mean_distance(), 1)
 
@@ -121,15 +147,34 @@ class QLearningEvolution:
 
             # perform genetic operations
             # get new state
-            state_next = self.discretize_state(*evolution.next_generation(cross_func, cross_prob))
+            mean_dist, succ_rate = evolution.next_generation(cross_func, cross_prob)
+
+            state_next = self.discretize_state(mean_dist, succ_rate)
 
             # get reward
-            reward = self.reward_function(*state_next)
+            reward = self.reward_function(succ_rate, mean_dist)
 
             # update qtable
             self.update_qtable(state, action, state_next, reward)
 
             # next iteration
             state = state_next
-            print(f"Best: {evolution.best}, evaluation {evolution.best_evaluation}, avg distance {state[0]}, success rate {state[1]}, crossing {cross_func.__name__}, crossing probability {cross_prob}")
 
+            new_record = Record(
+                best_point=evolution.best,  # type: ignore
+                best_evaluation=evolution.best_evaluation,
+                avg_distance=mean_dist,
+                distance_bin=state[0],
+                success_rate=succ_rate,
+                success_bin=state[1],
+                crossing_func=cross_func.__name__,
+                crossing_probability=cross_prob,
+                reward=reward
+            )
+            history.append(new_record)
+            if verbose is True:
+                msg = f"Best: {evolution.best}, evaluation {evolution.best_evaluation}, "
+                msg += f"avg distance {state[0]}, success rate {state[1]}, "
+                msg += f"crossing {cross_func.__name__}, crossing probability {cross_prob}"
+                print(msg)
+        return history

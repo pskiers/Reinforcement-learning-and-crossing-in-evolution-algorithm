@@ -169,8 +169,8 @@ def uniform_crossing(population: np.ndarray, probability: float) -> None:
     num_of_feat = population.shape[1]
     for i in range(0, len(population), 2):
         if do_cross[i//2] < probability:
-            for f in range(num_of_feat):
+            for feat in range(num_of_feat):
                 if np.random.random() < 0.5:
-                    population[i][f], population[i+1][f] = (
-                        population[i+1][f], population[i][f]
+                    population[i][feat], population[i+1][feat] = (
+                        population[i+1][feat], population[i][feat]
                     )
