@@ -101,15 +101,12 @@ class EvolutionAlgorithm:
 
     def _calculate_success_rate(self) -> float:
         """
-        Calculates success rate by calculating mean percent of specimens from previous population
-        worse than specimen from current population
+        Calculates success rate by calculating the percent of specimens better than previous
+        best evaluation
 
         :return: success rate
         """
-        successes = 0
-        for evaluation in self.evaluations:
-            successes += (self.previous_evaluations < evaluation).sum()
-        return successes / (self.population_size * self.population_size)
+        return (self.best_evaluation < self.evaluations).sum()
 
     def calculate_mean_distance(self) -> float:
         """
