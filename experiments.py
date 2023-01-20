@@ -1,9 +1,11 @@
+from cec2017.functions import f21, f22, f23, f24
+
+
 # hyperparams to tweak
-POPULATION_SIZES = []
-MUTATION_STRENGTHS = []
-DIMENSIONALITIES = []
-CEC_FUNCTIONS = []
-VALUE_FUNCTIONS = []
+POPULATION_SIZES = [10, 100, 1000]
+MUTATION_STRENGTHS = [0, 0.1, 0.3, 0.5]
+DIMENSIONALITIES = [2, 10, 20]
+VALUE_FUNCTIONS = {'f21': f21, 'f22': f22, 'f23': f23, 'f24': f24}
 
 # constant hyperparams
 EPOCHS = 0
