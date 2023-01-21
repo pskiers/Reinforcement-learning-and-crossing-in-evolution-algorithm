@@ -56,7 +56,18 @@ if __name__ == '__main__':
                                             mutation_strength=mut_strength,
                                             upper_bound=100,
                                             dimensionality=dim)
-                    # qle = QLearningEvolution()
+                    qle = QLearningEvolution(evolution_algorithm=ea,
+                                             mean_distance_bins=MEAN_DISTANCE_BINS,
+                                             success_rate_bins=SUCCESS_RATE_BINS,
+                                             crossing_functions=CROSSING_FUNCTIONS.values(),
+                                             crossing_probabilities=CROSSING_PROBABILITIES,
+                                             epsilon=EPSILON,
+                                             learning_rate=LEARNING_RATE,
+                                             discount_factor=DISCOUNT_FACTOR,
+                                             reward_function=REWARD_FUNCTION)
+                    # run a copy of ea 25 times
+                    # collect results
+
                     # run QLE 25 times
                     # collect records
                     # save results to dataframe
