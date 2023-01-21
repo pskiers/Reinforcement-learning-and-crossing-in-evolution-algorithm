@@ -26,7 +26,7 @@ LEARNING_RATE = 0.9
 DISCOUNT_FACTOR = 0.5
 
 # ???
-REWARD_FUNCTION = None
+REWARD_FUNCTION = lambda x,y: x
 
 # files
 OUTPUT_FILE = 'results.csv'
