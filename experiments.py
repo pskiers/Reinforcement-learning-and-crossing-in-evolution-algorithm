@@ -61,7 +61,7 @@ if __name__ == '__main__':
         for mut_strength in tqdm(MUTATION_STRENGTHS):
             for dim in tqdm(DIMENSIONALITIES):
                 for func in tqdm(VALUE_FUNCTIONS):
-                    for i in tqdm(range(10)):
+                    for i in tqdm(range(25)):
                         ea = EvolutionAlgorithm(value_function=lambda x: np.apply_along_axis(func1d=lambda x: func(x) * -1, axis=1, arr=x),
                                                 population_size=pop_size,
                                                 mutation_strength=mut_strength,
