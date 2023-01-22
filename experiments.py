@@ -1,8 +1,9 @@
-import csv
 from typing import Any
 import numpy as np
+from tqdm import tqdm
+import pandas as pd
 
-from cec2017.functions import f1, f8, f15, f24
+from cec2017.functions import f1, f10, f24
 from qlearning_evolution import QLearningEvolution
 from evolution_algorithm import EvolutionAlgorithm
 from evolution_algorithm import one_point_crossing, average_crossing, uniform_crossing
@@ -20,12 +21,12 @@ LEARNING_RATE = 0.7
 DISCOUNT_FACTOR = 0.99
 
 # hyperparams to tweak
-POPULATION_SIZES = [10, 100, 1000]
+POPULATION_SIZES = [5, 10, 20]
 MUTATION_STRENGTHS = [0, 0.5, 1, 3]
 
 # experiment params
 DIMENSIONALITIES = [2, 10, 20]
-VALUE_FUNCTIONS = [f1, f8, f15, f24]
+VALUE_FUNCTIONS = [f1, f10, f24]
 REWARD_FUNCTIONS = {
     "linear success rate": lambda x,y: x,
     "square success rate": lambda x,y: x^2,
@@ -34,7 +35,7 @@ REWARD_FUNCTIONS = {
 }
 
 # files
-OUTPUT_FILE = 'results.csv'
+OUTPUT_FILE = 'results_no2.csv'
 columns = [
     'algorithm',
     'value_function',
@@ -54,15 +55,13 @@ columns.extend([f'{f.__name__} uses' for f in CROSSING_FUNCTIONS])
 columns.extend([f'{p} crossing probability uses' for p in CROSSING_PROBABILITIES])
 
 if __name__ == '__main__':
-    with open(OUTPUT_FILE, 'w') as f:
-        writer = csv.DictWriter(f, columns)
-        writer.writeheader()
+    rows = []
 
-    for pop_size in POPULATION_SIZES:
-        for mut_strength in MUTATION_STRENGTHS:
-            for dim in DIMENSIONALITIES:
-                for func in VALUE_FUNCTIONS:
-                    for i in range(25):
+    for pop_size in tqdm(POPULATION_SIZES):
+        for mut_strength in tqdm(MUTATION_STRENGTHS):
+            for dim in tqdm(DIMENSIONALITIES):
+                for func in tqdm(VALUE_FUNCTIONS):
+                    for i in tqdm(range(10)):
                         ea = EvolutionAlgorithm(value_function=lambda x: np.apply_along_axis(func1d=lambda x: func(x) * -1, axis=1, arr=x),
                                                 population_size=pop_size,
                                                 mutation_strength=mut_strength,
@@ -79,54 +78,52 @@ if __name__ == '__main__':
                                                      learning_rate=LEARNING_RATE,
                                                      discount_factor=DISCOUNT_FACTOR,
                                                      reward_function=REWARD_FUNCTIONS[reward_func_name])
-                            records = qle.run(EPOCH_MAX)
-                            result: dict[str, Any] = {}
-                            result['algorithm'] = 'Q-Learning Evolution'
-                            result['value_function'] = func.__name__
-                            result['dimensionalities'] = dim
-                            result['population_size'] = pop_size
-                            result['mutation_strength'] = mut_strength
-                            result['mean_distances'] = MEAN_DISTANCE_BINS
-                            result['success_rate_bins'] = SUCCESS_RATE_BINS
-                            result['epsilon'] = EPSILON
-                            result['learning_rate'] = LEARNING_RATE
-                            result['discount_factor'] = DISCOUNT_FACTOR
-                            result['run_number'] = i
+                            records = qle.run(EPOCH_MAX, verbose=False)
                             for epoch in EPOCHS:
+                                result: dict[str, Any] = {}
+                                result['algorithm'] = 'Q-Learning Evolution'
+                                result['value_function'] = func.__name__
+                                result['dimensionalities'] = dim
+                                result['population_size'] = pop_size
+                                result['mutation_strength'] = mut_strength
+                                result['mean_distances'] = MEAN_DISTANCE_BINS
+                                result['success_rate_bins'] = SUCCESS_RATE_BINS
+                                result['epsilon'] = EPSILON
+                                result['learning_rate'] = LEARNING_RATE
+                                result['discount_factor'] = DISCOUNT_FACTOR
+                                result['run_number'] = i
                                 result['epochs'] = epoch
                                 result['best_score'] = records[epoch].best_evaluation
                                 for f in CROSSING_FUNCTIONS:
                                     result[f'{f.__name__} uses'] = 0
                                 for p in CROSSING_PROBABILITIES:
                                     result[f'{p} crossing probability uses'] = 0
-                                for record in records:
+                                for record in records[:epoch]:
                                     result[f'{record.crossing_func} uses'] += 1
                                     result[f'{record.crossing_probability} crossing probability uses'] += 1
-                                with open(OUTPUT_FILE, 'a') as f:
-                                    writer = csv.DictWriter(f, columns)
-                                    writer.writerow(result)
+                                rows.append(result)
                         for cross_func in CROSSING_FUNCTIONS:
                             for cross_prob in CROSSING_PROBABILITIES:
-                                history = ea.run(EPOCH_MAX, cross_func, cross_prob)
-                                result: dict[str, Any] = {}
-                                result['algorithm'] = 'Evolution algorithm'
-                                result['value_function'] = func.__name__
-                                result['dimensionalities'] = dim
-                                result['population_size'] = pop_size
-                                result['mutation_strength'] = mut_strength
-                                result['mean_distances'] = None
-                                result['success_rate_bins'] = None
-                                result['epsilon'] = None
-                                result['learning_rate'] = None
-                                result['discount_factor'] = None
-                                result['run_number'] = i
+                                history = ea.run(EPOCH_MAX, cross_func, cross_prob, verbose=False)
                                 for epoch in EPOCHS:
+                                    result: dict[str, Any] = {}
+                                    result['algorithm'] = 'Evolution algorithm'
+                                    result['value_function'] = func.__name__
+                                    result['dimensionalities'] = dim
+                                    result['population_size'] = pop_size
+                                    result['mutation_strength'] = mut_strength
+                                    result['mean_distances'] = None
+                                    result['success_rate_bins'] = None
+                                    result['epsilon'] = None
+                                    result['learning_rate'] = None
+                                    result['discount_factor'] = None
+                                    result['run_number'] = i
                                     result['epochs'] = epoch
                                     result['best_score'] = history[epoch]['evaluation']
                                     for f in CROSSING_FUNCTIONS:
                                         result[f'{f.__name__} uses'] = None
                                     for p in CROSSING_PROBABILITIES:
                                         result[f'{p} crossing probability uses'] = None
-                                    with open(OUTPUT_FILE, 'a') as f:
-                                        writer = csv.DictWriter(f, columns)
-                                        writer.writerow(result)
+                                    rows.append(result)
+        df = pd.DataFrame(rows)
+        df.to_csv(OUTPUT_FILE)
