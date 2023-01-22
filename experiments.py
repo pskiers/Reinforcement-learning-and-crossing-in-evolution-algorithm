@@ -21,7 +21,7 @@ LEARNING_RATE = 0.7
 DISCOUNT_FACTOR = 0.99
 
 # hyperparams to tweak
-POPULATION_SIZES = [5, 10, 20]
+POPULATION_SIZES = [6, 10, 20]
 MUTATION_STRENGTHS = [0, 0.5, 1, 3]
 
 # experiment params
