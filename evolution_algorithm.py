@@ -23,16 +23,37 @@ class EvolutionAlgorithm:
         self.population_size: int = population_size
         self.mutation_strength: float = mutation_strength
         self.dimensionality: int = dimensionality
+        self.upper_bound = upper_bound
+        self.reset()
+
+    def reset(self):
+        """
+        Resets the algorithm
+        """
         self.epoch: int = 0
         self.population: np.ndarray = np.random.uniform(
-            low=-upper_bound, high=upper_bound, size=(population_size, dimensionality)
+            low=-self.upper_bound, high=self.upper_bound, size=(self.population_size, self.dimensionality)
         )
-        self.previous_population: np.ndarray = np.zeros(shape=(population_size, dimensionality))
+        self.previous_population: np.ndarray = np.zeros(shape=(self.population_size, self.dimensionality))
         self.evaluations: np.ndarray = self.value_function(self.population)
-        self.previous_evaluations: np.ndarray = np.zeros(shape=(population_size, dimensionality))
+        self.previous_evaluations: np.ndarray = np.zeros(shape=(self.population_size, self.dimensionality))
         self.best_evaluation: float = float("-inf")
         self.best: np.ndarray | None = None
         self._find_best()
+
+    def run(self, iterations: int, crossing_type: Callable[[np.ndarray, float], None], crossing_probability: float, verbose: bool = True):
+        """
+        Runs the algorithm
+        """
+        self.reset()
+        history = []
+        while self.epoch < iterations:
+            self.next_generation(crossing_type, crossing_probability)
+            history.append({"point": self.best, "evaluation": self.best_evaluation})
+            if verbose is True:
+                msg = f"Best: {self.best}, evaluation {self.best_evaluation}, "
+                print(msg)
+        return history
 
     def next_generation(
         self, crossing_type: Callable[[np.ndarray, float], None], crossing_probability: float

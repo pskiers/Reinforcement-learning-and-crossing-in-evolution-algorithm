@@ -10,8 +10,8 @@ from cec2017.functions import f1
 
 if __name__ == "__main__":
     evolution = EvolutionAlgorithm(
-        # value_function=lambda x: np.apply_along_axis(func1d=f1, axis=1, arr=x),
-        value_function=lambda x: f1(x) * -1,
+        value_function=lambda x: np.apply_along_axis(func1d=lambda x: f1(x) * -1, axis=1, arr=x),
+        # value_function=lambda x: f1(x) * -1,
         population_size=128,
         mutation_strength=0.3,
         upper_bound=100,

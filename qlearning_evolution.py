@@ -3,9 +3,10 @@ Module containing implementation of qlearning algorithm
 """
 import copy
 from typing import Callable
-from dataclasses import dataclass
 import numpy as np
 from evolution_algorithm import EvolutionAlgorithm
+from dataclasses import dataclass
+
 
 @dataclass
 class Record:
@@ -21,7 +22,6 @@ class Record:
     crossing_func: str
     crossing_probability: float
     reward: float
-
 
 
 class QLearningEvolution:
